@@ -1,5 +1,6 @@
 #include <string.h>
 #include <curl/curl.h>
+#include <time.h>
 
 #include "twilio.h"
 
@@ -37,8 +38,8 @@ int twilio_send_message(char *account_sid,
                         bool verbose)
 {
 
-        // See: https://www.twilio.com/docs/api/rest/sending-messages for
-        // information on Twilio body size limits.
+        /* See: https://www.twilio.com/docs/api/rest/sending-messages for
+         information on Twilio body size limits. */
         if (strlen(message) > 1600) {
             fprintf(stderr, "SMS send failed.\n"
                     "Message body must be less than 1601 characters.\n"
@@ -125,4 +126,12 @@ int twilio_send_message(char *account_sid,
                 return 0;
         }
 
+}
+
+int main()
+{
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    
+    printf("Right now the time is: %d-%d-%d %d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min);
 }

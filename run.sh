@@ -1,0 +1,1 @@
+./app -a 76d4c2951b30b4f21da0025b7462b52b -s AC4d2aa5e7fdc7e0923dcbdd5970608d60 -t "+13174305963" -f "+18005551213" -m "Hello, World!"
