@@ -2,7 +2,9 @@
 #include <curl/curl.h>
 #include <time.h>
 
-#include "twilio.h"
+#define MAX_TWILIO_MESSAGE_SIZE 10000
+typedef enum { false, true }    bool;
+/*#include "twilio.h"*/
 
 /*
 * _twilio_null_write is a portable way to ignore the response from 
@@ -34,7 +36,6 @@ int twilio_send_message(char *account_sid,
                         char *message,
                         char *from_number,
                         char *to_number,
-                        char *picture_url,
                         bool verbose)
 {
 
@@ -61,7 +62,7 @@ int twilio_send_message(char *account_sid,
                  "/Messages");
 
         char parameters[MAX_TWILIO_MESSAGE_SIZE];
-        if (!picture_url) {
+
             snprintf(parameters,
                      sizeof(parameters),
                      "%s%s%s%s%s%s",
@@ -71,19 +72,6 @@ int twilio_send_message(char *account_sid,
                      from_number,
                      "&Body=",
                      message);
-        } else {
-            snprintf(parameters,
-                     sizeof(parameters),
-                     "%s%s%s%s%s%s%s%s",
-                     "To=",
-                     to_number,
-                     "&From=",
-                     from_number,
-                     "&Body=",
-                     message,
-                     "&MediaUrl=",
-                     picture_url);
-        }
 
 
         curl_easy_setopt(curl, CURLOPT_POST, 1);
@@ -130,8 +118,27 @@ int twilio_send_message(char *account_sid,
 
 int main()
 {
+    char sid[] = "AC4d2aa5e7fdc7e0923dcbdd5970608d60";
+    char auth[] = "76d4c2951b30b4f21da0025b7462b52b";
+    char msg[] = "testing";
+    char from[] = "+18142470271";
+    char to[] = "+13174305963";
+    int ret = 0;
+    int verb = 0;
+
+    char *sidptr = sid;
+    char *authptr = auth;
+    char *msgptr = msg;
+    char *fromptr = from;
+    char *toptr = to;
+    
+    
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
     
     printf("Right now the time is: %d-%d-%d %d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min);
+
+    ret = twilio_send_message(sidptr, authptr, msgptr, fromptr, toptr, verb);
+
+    return ret;
 }
