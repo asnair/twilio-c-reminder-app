@@ -145,8 +145,6 @@ struct alarm
 
 };
 
-void bubble_num(struct alarm alarm[], int);
-
 void bubble_num(struct alarm alarm[], int size)
 {
     long i, j, temp;
@@ -195,13 +193,7 @@ int main()
 
 	//printf("%s\n", times); doesn't apear in console
 
-    printf("Account Sorted by times\n");
-
-	bubble_num(student, size);
-	for (i = 0; i < 10; i++)
-		printf("name : %s\nDate/time : %ld\nPhone : %s\nAge : %d\n\n", student[i].name, student[i].num, student[i].call, student[i].year);
-
-	for (i = 0; i < size; i++)
+   	for (i = 0; i < size; i++)
 	{
 		printf("Enter alarm message text: ");
 		scanf("%s", notification[i].message);
@@ -230,16 +222,3 @@ int main()
     return ret;
 }
 
-void bubble_num(struct User student[], int size)
-{
-	long i, j, temp;
-	for (i = 0; i < size - 1; i++)
-		for (j = 0; j<size - i - 1; j++)
-			if (student[j].num > student[j + 1].num)
-			{
-				temp = student[j].num;
-				student[j].num = student[j + 1].num;
-				student[j + 1].num = temp;
-
-			}
-}
