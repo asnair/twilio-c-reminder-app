@@ -1,4 +1,6 @@
 #include <string.h>
+#include<stdlib.h>
+#include<stdio.h>
 #include <curl/curl.h>
 #include <time.h>
 
@@ -41,7 +43,8 @@ int twilio_send_message(char *account_sid,
 
         /* See: https://www.twilio.com/docs/api/rest/sending-messages for
          information on Twilio body size limits. */
-        if (strlen(message) > 1600) {
+        if (strlen(message) > 1600) 
+		{
             fprintf(stderr, "SMS send failed.\n"
                     "Message body must be less than 1601 characters.\n"
                     "The message had %zu characters.\n", strlen(message));
@@ -80,7 +83,8 @@ int twilio_send_message(char *account_sid,
         curl_easy_setopt(curl, CURLOPT_USERNAME, account_sid);
         curl_easy_setopt(curl, CURLOPT_PASSWORD, auth_token);
 
-        if (!verbose) {
+        if (!verbose) 
+		{
                 curl_easy_setopt(curl, 
                                  CURLOPT_WRITEFUNCTION, 
                                  _twilio_null_write);
@@ -92,53 +96,141 @@ int twilio_send_message(char *account_sid,
         long http_code = 0;
         curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
 
-        if (res != CURLE_OK) {
-                if (verbose) {
+        if (res != CURLE_OK) 
+		{
+                if (verbose) 
+				{
                         fprintf(stderr,
                                 "SMS send failed: %s.\n",
                                 curl_easy_strerror(res));
                 }
                 return -1;
-        } else if (http_code != 200 && http_code != 201) {
-                if (verbose) {
+        } 
+		else if (http_code != 200 && http_code != 201) 
+		{
+                if (verbose) 
+				{
                         fprintf(stderr,
                                 "SMS send failed, HTTP Status Code: %ld.\n",
                                 http_code);
                 }
                 return -1;
-        } else {
-                if (verbose) {
-                        fprintf(stderr,
-                                "SMS sent successfully!\n");
+        } 
+		else 
+		{
+                if (verbose) 
+				{
+                        fprintf(stderr, "SMS sent successfully!\n");
                 }
                 return 0;
         }
 
 }
 
+struct User 
+{
+	char name[30];
+	long num;
+	char call[20];
+	int year;
+};
+
+struct Notification
+{
+	char message[50];
+	long time;
+	long timeBeforeRemind;
+	char phoneNum[11];
+};
+
+void bubble_num(struct User student[], int );
+
 int main()
 {
+	int i;
+	int size = 10;
+	char key = 0;
     char sid[] = "AC4d2aa5e7fdc7e0923dcbdd5970608d60";
     char auth[] = "76d4c2951b30b4f21da0025b7462b52b";
     char msg[] = "testing";
     char from[] = "+18142470271";
-    char to[] = "+13174305963";
+    char to[] = "+17657145071";
     int ret = 0;
     int verb = 0;
+	char times[30];
+
+	struct User student[10] = { { "apolo", 20181220813, "765438192", 22 },
+								{ "cypers", 20181220810, "765382913", 20 },
+								{ "bear", 20181220801, "2198467382", 20 },
+								{ "griffis", 20181220811, "765193892", 19 },
+								{ "stella", 20181220805, "2938472019", 20 },
+								{ "nancy", 20181220820, "7116473829", 20 },
+								{ "rose", 20181220817, "9604938249", 21 },
+								{ "yellowpete", 20181220819, "96784893930", 20 },
+								{ "welch", 20181220822, "86948362843", 21 },
+								{ "ustar", 20181220806, "97058472894", 22 } };
+
+	struct Notification notification[size];
 
     char *sidptr = sid;
     char *authptr = auth;
     char *msgptr = msg;
     char *fromptr = from;
     char *toptr = to;
-    
-    
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
-    
+
+	//printf(times, "%d%d%d%d%d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min); doesn't appear in console
+
     printf("Right now the time is: %d-%d-%d %d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min);
+
+	//printf("%s\n", times); doesn't apear in console
+
+	printf("====================================\n");
+	printf("Account Information\n");
+	for (i = 0; i<10; i++)
+		printf("name : %s\nDate/time : %ld\nPhone : %s\nAge : %d\n\n", student[i].name, student[i].num, student[i].call, student[i].year);
+
+
+	printf("====================================\n");
+	printf("Account Sorted by times\n");
+
+	bubble_num(student, size);
+	for (i = 0; i < 10; i++)
+		printf("name : %s\nDate/time : %ld\nPhone : %s\nAge : %d\n\n", student[i].name, student[i].num, student[i].call, student[i].year);
+
+	for (i = 0; i < size; i++)
+	{
+		printf("Enter alarm message text: ");
+		scanf("%s", notification[i].message);
+		printf("Enter a time of alarm (yyyymmddhhmm) as in year month day hour minute: ");
+		scanf("%ld", &notification[i].time);
+		printf("Enter a time of when alarm goes off minutes before the time (mm) as in minutes: ");
+		scanf("%ld", &notification[i].timeBeforeRemind);
+		printf("Enter a phone number (+xxxxxxxxxxx): ");
+		scanf("%s", notification[i].phoneNum);
+	}
+	
+	for (i = 0; i < size; i++)
+	{
+		printf("\nAlarm Message: %s\nAlarm Time: %ld\nTime before alarm: %ld\nPhone Number: %s\n\n", notification[i].message, notification[i].time, notification[i].timeBeforeRemind, notification[i].phoneNum);
+	}
 
     ret = twilio_send_message(sidptr, authptr, msgptr, fromptr, toptr, verb);
 
     return ret;
+}
+
+void bubble_num(struct User student[], int size)
+{
+	long i, j, temp;
+	for (i = 0; i < size - 1; i++)
+		for (j = 0; j<size - i - 1; j++)
+			if (student[j].num > student[j + 1].num)
+			{
+				temp = student[j].num;
+				student[j].num = student[j + 1].num;
+				student[j + 1].num = temp;
+
+			}
 }
