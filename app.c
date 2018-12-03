@@ -116,6 +116,33 @@ int twilio_send_message(char *account_sid,
 
 }
 
+int size = 10;
+struct alarm{
+    char msg[1000];
+    long time;
+    char num[12];
+    int alarmwarning;
+
+};
+
+void bubble_num(struct alarm alarm[], int);
+
+void bubble_num(struct alarm alarm[], int size)
+{
+    long i, j, temp;
+    for(i=0;i<size-1;i++){
+            for(j=0;j<size-i-1;j++){
+                        if(alarm[j].time>alarm[j+1].time){
+                            temp=alarm[j].time;
+                            alarm[j].time = alarm[j + 1].time;
+                            alarm[j + 1].time = temp;
+
+                        }
+            }
+    }
+
+}
+
 int main()
 {
     char sid[] = "AC4d2aa5e7fdc7e0923dcbdd5970608d60";
@@ -131,6 +158,9 @@ int main()
     char *msgptr = msg;
     char *fromptr = from;
     char *toptr = to;
+
+    struct alarm alarm[10] = {
+        {"test message", 201812031230, "+13174305963", 30}};
     
     
     time_t t = time(NULL);
@@ -140,5 +170,12 @@ int main()
 
     ret = twilio_send_message(sidptr, authptr, msgptr, fromptr, toptr, verb);
 
+    int i;
+    bubble_num(alarm,size);
+        for(i=0;i<10;i++)
+                printf("name : %s\nDate/time : %ld\nPhone : %s\nAge : %d\n\n",alarm[i].msg,alarm[i].time,alarm[i].num,alarm[i].alarmwarning);
+
+
+    
     return ret;
 }
