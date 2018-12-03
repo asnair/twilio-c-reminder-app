@@ -28,6 +28,16 @@ Testing now works, you can see it called in the 'main' function. When taking use
 
 I've removed extra files, including /example and /include, as well as twilio.c and twilio.h, both of which I integrated into app.c. This app works with my phone number currently, we can change the phone number but any number we use must first be verified by Twilio. Subin's phone number is verified so the 'to[]' can be changed to his for testing.
 
+When scanning input, ask for input like the following:
+
+alarm message text (**ENTER**)
+
+time of alarm (yyyymmddhhmm) as in year month day hour minute (**ENTER**)
+
+number to text (+xxxxxxxxxxx) (**ENTER**)
+
+time of when alarm goes off minutes before the time (mm) as in minutes (**ENTER**)
+
 
 
 Things to do:
