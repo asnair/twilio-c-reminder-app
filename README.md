@@ -42,10 +42,10 @@ time of when alarm goes off minutes before the time (mm) as in minutes (**ENTER*
 
 Things to do:
 
-- [ ] Scan for user input continuously
+- [x] Scan for user input continuously
 - [ ] Check the time every minute for a new alarm continuously
 - [x] Figure out the texting issue
-- [ ] Save user input in an array of structs (a structure containing the time and and message)
+- [x] Save user input in an array of structs (a structure containing the time and and message)
 
 Following the guide from [https://www.twilio.com/docs/sms/tutorials/how-to-send-sms-messages-c](https://www.twilio.com/docs/sms/tutorials/how-to-send-sms-messages-c)
 
