@@ -89,7 +89,7 @@ int twilio_send_message(char *account_sid, char *auth_token, char *message,
 	{
 		if (verbose)
 		{
-			fprintf(stderr, "SMS send failed, HTTP Status Code: %s.\n", http_code);
+			fprintf(stderr, "SMS send failed, HTTP Status Code: %ld.\n", http_code);
 		}
 		return -1;
 	}
@@ -113,7 +113,7 @@ struct alarm2
 
 void bubble_num(struct alarm2 alarm1[], int size)
 {
-    long i, j, z, temp;
+    long i, j, temp;
     for(i = 0; i < size - 1; i++)
 	{
 		for(j = 0; j < size - i - 1; j++)
@@ -130,17 +130,15 @@ void bubble_num(struct alarm2 alarm1[], int size)
 
 int main()
 {
-	int i;
+	int i, z;
 	int count = 0;
 	int size;
-	char key = 0;
 	char sid[] = "AC4d2aa5e7fdc7e0923dcbdd5970608d60";
 	char auth[] = "76d4c2951b30b4f21da0025b7462b52b";
 	char msg[] = "testing";
 	char from[] = "+18142470271";
-	char to[] = "+17657145071";
+	char to[] = "0";
 	int ret = 0;
-	char times[30];
 
 	char *sidptr = sid;
 	char *authptr = auth;
@@ -149,16 +147,18 @@ int main()
 	char *toptr = to;
 	bool verb = true;
 
-	struct alarm2 alarm1[MAX_TWILIO_MESSAGE_SIZE];
+	struct alarm2 alarm1[MAX_TWILIO_MESSAGE_SIZE], *alarm1PTR;
 	size = sizeof(alarm1) / sizeof(alarm1[0]);
 
 	time_t t = time(NULL);
 	struct tm tm = *localtime(&t);
 
+
+    alarm1PTR = &alarm1;
 	/*printf(times, "%d%d%d%d%d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min);*/
 
 	printf("\n-------------------------------------\n");
-	printf("Right now the time is: %d-%d-%d %d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min);
+	printf("Right now the time is: %d%d%d %d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min);
 	printf("-------------------------------------\n");
 
 	/*printf("%s\n", times);*/
@@ -192,12 +192,12 @@ int main()
 	} 
 	while (tolower(answer) == 'y');
 
+    char *numsptr[count + 1];
 	for (i = 0; i < count; i++)
-	{
-		printf("\n Message: %s\nalarm1 Time: %s\nTime before alarm: %d\nPhone Number: %s\n\n", alarm1[i].msg, alarm1[i].time, alarm1[i].alarmwarning, alarm1[i].num);
+    {
+/*numsptr[i] = &(alarm[i].num);*/
+		printf("\n Message: %s\nalarm1 Time: %d\nTime before alarm: %d\nPhone Number: %s\n\n", alarm1[i].msg, alarm1[i].time, alarm1[i].alarmwarning, alarm1[i].num);
 	}
-
-	ret = twilio_send_message(sidptr, authptr, msgptr, fromptr, toptr, verb);
 
 	printf("\n\n--------------------------------\n");
 	printf(" information sorted by time\n");
@@ -257,10 +257,11 @@ int main()
 
     dif = ((year - (tm.tm_year + 1900))/31536000) + ((month - (tm.tm_mon + 1))/2628000) + ((day - (tm.tm_mday))/86400) + ((hr -tm.tm_hour)/3600) + ((min - tm.tm_min)/60);
     
+    printf("\ndifference: %d", dif);
     while(alarm(dif) != 0)
         printf("\n%d seconds left until ", alarm(dif));
 
-    ret = twilio_send_message(sidptr, authptr, msgptr, fromptr, toptr, verb);
+    ret = twilio_send_message(sidptr, authptr, msgptr, fromptr, alarm1PTR->num, verb);
 
 	return ret;
 }
