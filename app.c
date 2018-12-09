@@ -14,6 +14,7 @@ typedef enum { false, true }    bool;
 * _twilio_null_write is a portable way to ignore the response from 
 * curl_easy_perform
 */
+
 size_t _twilio_null_write(char *ptr, size_t size, size_t nmemb, void *userdata)
 {
     return size * nmemb;
@@ -35,12 +36,14 @@ size_t _twilio_null_write(char *ptr, size_t size, size_t nmemb, void *userdata)
 *         - picture_url: If picture URL is not NULL and is a valid image url, a
                 MMS will be sent by Twilio.
 */
+
 int twilio_send_message(char *account_sid, char *auth_token, char *message,
 						char *from_number, char *to_number, bool verbose)
 {
 
 	/* See: https://www.twilio.com/docs/api/rest/sending-messages for
 	 information on Twilio body size limits. */
+
 	if (strlen(message) > 1600)
 	{
 		fprintf(stderr, "SMS send failed.\n" "Message body must be less than 1601 characters.\n" "The message had %zu characters.\n", strlen(message));
@@ -106,7 +109,7 @@ int twilio_send_message(char *account_sid, char *auth_token, char *message,
 struct alarm2
 {
     char msg[1000];
-    int time;
+    long time;
 	int alarmwarning;
     char num[12];
 };
@@ -159,7 +162,7 @@ int main()
 
 	printf("\n-------------------------------------\n");
 	printf("Right now the time is: %d%d%d %d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min);
-	printf("-------------------------------------\n");
+	printf("-------------------------------------\n\n");
 
 	/*printf("%s\n", times);*/
 
@@ -168,11 +171,11 @@ int main()
 	{
 		if (count < size)
 		{
-			printf("Enter  message text: ");
+			printf("Enter message text: ");
 			scanf("%[^'\n']s", alarm1[count].msg);
 			getchar();
-			printf("Enter a time of  (yyyymmddhhmm) as in year month day hour minute: ");
-			scanf("%d", &alarm1[count].time);
+			printf("Enter a time of (yyyymmddhhmm) as in year month day hour minute: ");
+			scanf("%ld", &alarm1[count].time);
 			getchar();
 			printf("Enter a time of when  goes off minutes before the time (mm) as in minutes: ");
 			scanf("%d", &alarm1[count].alarmwarning);
@@ -196,21 +199,21 @@ int main()
 	for (i = 0; i < count; i++)
     {
 /*numsptr[i] = &(alarm[i].num);*/
-		printf("\n Message: %s\nalarm1 Time: %d\nTime before alarm: %d\nPhone Number: %s\n\n", alarm1[i].msg, alarm1[i].time, alarm1[i].alarmwarning, alarm1[i].num);
+		printf("\nMessage: %s\nalarm1 Time: %ld\nTime before alarm: %d\nPhone Number: %s\n", alarm1[i].msg, alarm1[i].time, alarm1[i].alarmwarning, alarm1[i].num);
 	}
 
-	printf("\n\n--------------------------------\n");
+	printf("\n--------------------------------\n");
 	printf(" information sorted by time\n");
 	printf("--------------------------------\n");
 
 	bubble_num(alarm1, count);
 	for (i = 0; i < count; i++)
 	{
-		printf("\n Message: %s\nalarm1 Time: %d\nTime before alarm: %d\nPhone Number: %s\n", alarm1[i].msg, alarm1[i].time, alarm1[i].alarmwarning, alarm1[i].num);
+		printf("\nMessage: %s\nalarm1 Time: %ld\nTime before alarm: %d\nPhone Number: %s\n", alarm1[i].msg, alarm1[i].time, alarm1[i].alarmwarning, alarm1[i].num);
 	}
 
     unsigned int alarm(unsigned int seconds);
-    int time[13];
+    long time[14];
     int year = 0;
     int month = 0;
     int day = 0;
@@ -227,6 +230,7 @@ int main()
         /* extract each digit */
         while (n != 0)
         {
+			printf("test1\n");
             time[c] = n % 10;
             n /= 10;
             c++;
@@ -258,10 +262,15 @@ int main()
     dif = ((year - (tm.tm_year + 1900))/31536000) + ((month - (tm.tm_mon + 1))/2628000) + ((day - (tm.tm_mday))/86400) + ((hr -tm.tm_hour)/3600) + ((min - tm.tm_min)/60);
     
     printf("\ndifference: %d", dif);
-    while(alarm(dif) != 0)
-        printf("\n%d seconds left until ", alarm(dif));
+	while (alarm(dif) != 0)
+	{
+		printf("test2\n");
+		printf("\n%u seconds left until ", alarm(dif));
+	}
 
     ret = twilio_send_message(sidptr, authptr, msgptr, fromptr, alarm1PTR->num, verb);
+
+	printf("\n\n");
 
 	return ret;
 }
