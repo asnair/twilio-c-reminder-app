@@ -3,6 +3,8 @@
 #include<stdio.h>
 #include <curl/curl.h>
 #include <time.h>
+#include <math.h>
+#include <unistd.h>
 
 #define MAX_TWILIO_MESSAGE_SIZE 1000
 typedef enum { false, true }    bool;
@@ -87,7 +89,7 @@ int twilio_send_message(char *account_sid, char *auth_token, char *message,
 	{
 		if (verbose)
 		{
-			fprintf(stderr, "SMS send failed, HTTP Status Code: %ld.\n", http_code);
+			fprintf(stderr, "SMS send failed, HTTP Status Code: %s.\n", http_code);
 		}
 		return -1;
 	}
@@ -101,26 +103,26 @@ int twilio_send_message(char *account_sid, char *auth_token, char *message,
 	}
 }
 
-struct Alarm
+struct alarm2
 {
     char msg[1000];
-    long time;
+    int time;
 	int alarmwarning;
     char num[12];
 };
 
-void bubble_num(struct Alarm alarm[], int size)
+void bubble_num(struct alarm2 alarm1[], int size)
 {
-    long i, j, temp;
+    long i, j, z, temp;
     for(i = 0; i < size - 1; i++)
 	{
-		for(j = 0;j < size - i - 1; j++)
+		for(j = 0; j < size - i - 1; j++)
 		{
-			if(alarm[j].time > alarm[j + 1].time)
+			if(alarm1[j].time > alarm1[j + 1].time)
 			{
-				temp = alarm[j].time;
-                alarm[j].time = alarm[j + 1].time;
-                alarm[j + 1].time = temp;
+				temp = alarm1[j].time;
+                alarm1[j].time = alarm1[j + 1].time;
+                alarm1[j + 1].time = temp;
             }
         }
     }
@@ -147,8 +149,8 @@ int main()
 	char *toptr = to;
 	bool verb = true;
 
-	struct Alarm alarm[MAX_TWILIO_MESSAGE_SIZE];
-	size = sizeof(alarm) / sizeof(alarm[0]);
+	struct alarm2 alarm1[MAX_TWILIO_MESSAGE_SIZE];
+	size = sizeof(alarm1) / sizeof(alarm1[0]);
 
 	time_t t = time(NULL);
 	struct tm tm = *localtime(&t);
@@ -166,17 +168,17 @@ int main()
 	{
 		if (count < size)
 		{
-			printf("Enter alarm message text: ");
-			scanf("%[^'\n']s", alarm[count].msg);
+			printf("Enter  message text: ");
+			scanf("%[^'\n']s", alarm1[count].msg);
 			getchar();
-			printf("Enter a time of alarm (yyyymmddhhmm) as in year month day hour minute: ");
-			scanf("%ld", &alarm[count].time);
+			printf("Enter a time of  (yyyymmddhhmm) as in year month day hour minute: ");
+			scanf("%d", &alarm1[count].time);
 			getchar();
-			printf("Enter a time of when alarm goes off minutes before the time (mm) as in minutes: ");
-			scanf("%d", &alarm[count].alarmwarning);
+			printf("Enter a time of when  goes off minutes before the time (mm) as in minutes: ");
+			scanf("%d", &alarm1[count].alarmwarning);
 			getchar();
 			printf("Enter a phone number (+xxxxxxxxxxx): ");
-			scanf("%s", alarm[count].num);
+			scanf("%s", alarm1[count].num);
 			getchar();
 			printf("\nDo you want to continue entering information(y/n)?: ");
 			answer = getchar();
@@ -192,20 +194,73 @@ int main()
 
 	for (i = 0; i < count; i++)
 	{
-		printf("\nAlarm Message: %s\nAlarm Time: %ld\nTime before alarm: %d\nPhone Number: %s\n\n", alarm[i].msg, alarm[i].time, alarm[i].alarmwarning, alarm[i].num);
+		printf("\n Message: %s\nalarm1 Time: %s\nTime before alarm: %d\nPhone Number: %s\n\n", alarm1[i].msg, alarm1[i].time, alarm1[i].alarmwarning, alarm1[i].num);
 	}
 
 	ret = twilio_send_message(sidptr, authptr, msgptr, fromptr, toptr, verb);
 
 	printf("\n\n--------------------------------\n");
-	printf("Alarm information sorted by time\n");
+	printf(" information sorted by time\n");
 	printf("--------------------------------\n");
 
-	bubble_num(alarm, count);
+	bubble_num(alarm1, count);
 	for (i = 0; i < count; i++)
 	{
-		printf("\nAlarm Message: %s\nAlarm Time: %ld\nTime before alarm: %d\nPhone Number: %s\n", alarm[i].msg, alarm[i].time, alarm[i].alarmwarning, alarm[i].num);
+		printf("\n Message: %s\nalarm1 Time: %d\nTime before alarm: %d\nPhone Number: %s\n", alarm1[i].msg, alarm1[i].time, alarm1[i].alarmwarning, alarm1[i].num);
 	}
+
+    unsigned int alarm(unsigned int seconds);
+    int time[13];
+    int year = 0;
+    int month = 0;
+    int day = 0;
+    int hr = 0;
+    int min = 0;
+    int dif = 0;
+    int y;
+
+    for (y = 0; y < count; y++)
+    {
+        int c = 0; /* digit position */
+        int n = alarm1[y].time;
+
+        /* extract each digit */
+        while (n != 0)
+        {
+            time[c] = n % 10;
+            n /= 10;
+            c++;
+        }
+
+
+        for (i = 0; i < 4; i++)
+        {
+            year = 10 * year + time[i];
+        }
+        for (i = 4; i < 7; i++)
+        {
+            month = 10 * month + time[i];
+        }
+        for (i = 7; i < 9; i++)
+        {
+            day = 10 * day + time[i];
+        }
+        for (i = 9; i < 11; i++)
+        {
+            hr = 10 * hr + time[i];
+        }
+        for (i = 11; i < 13; i++)
+        {
+            min = 10 * min + time[i];
+        }
+    }
+
+    dif = ((year - (tm.tm_year + 1900))/31536000) + ((month - (tm.tm_mon + 1))/2628000) + ((day - (tm.tm_mday))/86400) + ((hr -tm.tm_hour)/3600) + ((min - tm.tm_min)/60);
+    
+    while(alarm(dif) != 0)
+        printf("\n%d seconds left until ", alarm(dif));
+
+    ret = twilio_send_message(sidptr, authptr, msgptr, fromptr, toptr, verb);
 
 	return ret;
 }
