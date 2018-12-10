@@ -238,15 +238,15 @@ int main()
 	printf("\n%d %d %d %d %d\n", year, month, day, hr, min);
 
 	dif = ((year - (tm.tm_year + 1900)) * 31556900) + ((month - (tm.tm_mon + 1)) * 2628000) + ((day - (tm.tm_mday)) * 86400) + ((hr - tm.tm_hour) * 3600) + ((min - tm.tm_min) * 60);
-	printf("\ndifference: %d\n\n", dif);
+	printf("\nThe alarm will send in %d seconds\n\n", dif);
 
 	while (1)
 	{
-		printf("%u seconds left until \n", alarm(dif));
+		
 		t = time(NULL);
 		tm = *localtime(&t);
 		dif = ((year - (tm.tm_year + 1900)) * 31556900) + ((month - (tm.tm_mon + 1)) * 2628000) + ((day - (tm.tm_mday)) * 86400) + ((hr - tm.tm_hour) * 3600) + ((min - tm.tm_min) * 60);
-		if (dif == 0)
+        if (dif == 0)
 			break;
 	}
 
