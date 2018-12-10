@@ -177,7 +177,7 @@ int main()
 			printf("Enter a time of (yyyymmddhhmm) as in year month day hour minute: ");
 			scanf("%ld", &alarm1[count].time);
 			getchar();
-			printf("Enter a time of when  goes off minutes before the time (mm) as in minutes: ");
+			printf("Enter a time of when goes off minutes before the time (mm) as in minutes: ");
 			scanf("%d", &alarm1[count].alarmwarning);
 			getchar();
 			printf("Enter a phone number (+xxxxxxxxxxx): ");
@@ -203,7 +203,7 @@ int main()
 	}
 
 	printf("\n--------------------------------\n");
-	printf(" information sorted by time\n");
+	printf("Information sorted by time\n");
 	printf("--------------------------------\n");
 
 	bubble_num(alarm1, count);
@@ -213,62 +213,44 @@ int main()
 	}
 
     unsigned int alarm(unsigned int seconds);
-    long time[14];
     int year = 0;
     int month = 0;
     int day = 0;
     int hr = 0;
     int min = 0;
-    int dif = 0;
-    int y;
-
-    for (y = 0; y < count; y++)
+    unsigned int dif = 0;
+	
+	long tempTime;
+    for (i = 0; i < count; i++)
     {
-        int c = 0; /* digit position */
-        int n = alarm1[y].time;
-
-        /* extract each digit */
-        while (n != 0)
-        {
-			printf("test1\n");
-            time[c] = n % 10;
-            n /= 10;
-            c++;
-        }
-
-
-        for (i = 0; i < 4; i++)
-        {
-            year = 10 * year + time[i];
-        }
-        for (i = 4; i < 7; i++)
-        {
-            month = 10 * month + time[i];
-        }
-        for (i = 7; i < 9; i++)
-        {
-            day = 10 * day + time[i];
-        }
-        for (i = 9; i < 11; i++)
-        {
-            hr = 10 * hr + time[i];
-        }
-        for (i = 11; i < 13; i++)
-        {
-            min = 10 * min + time[i];
-        }
+		tempTime = alarm1[i].time;
+		min = tempTime % 100;
+		tempTime /= 100;
+		hr = tempTime % 100;
+		tempTime /= 100;
+		day = tempTime % 100;
+		tempTime /= 100;
+		month = tempTime % 100;
+		tempTime /= 100;
+		year = tempTime % 10000;
     }
+	
+	printf("\n%d %d %d %d %d\n", year, month, day, hr, min);
 
-    dif = ((year - (tm.tm_year + 1900))/31536000) + ((month - (tm.tm_mon + 1))/2628000) + ((day - (tm.tm_mday))/86400) + ((hr -tm.tm_hour)/3600) + ((min - tm.tm_min)/60);
-    
-    printf("\ndifference: %d", dif);
-	while (alarm(dif) != 0)
+	dif = ((year - (tm.tm_year + 1900)) * 31556900) + ((month - (tm.tm_mon + 1)) * 2628000) + ((day - (tm.tm_mday)) * 86400) + ((hr - tm.tm_hour) * 3600) + ((min - tm.tm_min) * 60);
+	printf("\ndifference: %d\n\n", dif);
+
+	while (1)
 	{
-		printf("test2\n");
-		printf("\n%u seconds left until ", alarm(dif));
+		printf("%u seconds left until \n", alarm(dif));
+		t = time(NULL);
+		tm = *localtime(&t);
+		dif = ((year - (tm.tm_year + 1900)) * 31556900) + ((month - (tm.tm_mon + 1)) * 2628000) + ((day - (tm.tm_mday)) * 86400) + ((hr - tm.tm_hour) * 3600) + ((min - tm.tm_min) * 60);
+		if (dif == 0)
+			break;
 	}
 
-    ret = twilio_send_message(sidptr, authptr, msgptr, fromptr, alarm1PTR->num, verb);
+    ret = twilio_send_message(sidptr, authptr, alarm1PTR->msg, fromptr, alarm1PTR->num, verb);
 
 	printf("\n\n");
 
